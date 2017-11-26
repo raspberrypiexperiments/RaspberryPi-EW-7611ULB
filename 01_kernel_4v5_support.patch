@@ -1,0 +1,31 @@
+--- a/EW-7611ULB_Bluetooth_driver/Linux_BT_USB_v3.1_20150526_8723BU_BTCOEX_20150119-5844_Edimax/bluetooth_usb_driver/rtk_bt.h	2016-03-24 00:37:20.000000000 +0100
++++ b/EW-7611ULB_Bluetooth_driver/Linux_BT_USB_v3.1_20150526_8723BU_BTCOEX_20150119-5844_Edimax/bluetooth_usb_driver/rtk_bt.h	2017-08-01 20:02:00.000000000 +0200
+@@ -44,7 +44,7 @@
+ #define BTCOEX
+ 
+ #if 1
+-#define RTKBT_DBG(fmt, arg...) printk(KERN_INFO "rtk_btusb: " fmt "\n" , ## arg)
++#define RTKBT_DBG(fmt, arg...) printk(KERN_DEBUG "rtk_btusb: " fmt "\n" , ## arg)
+ #define RTKBT_INFO(fmt, arg...) printk(KERN_INFO "rtk_btusb: " fmt "\n" , ## arg)
+ #define RTKBT_WARN(fmt, arg...) printk(KERN_WARNING "rtk_btusb: " fmt "\n", ## arg)
+ #else
+--- a/EW-7611ULB_Bluetooth_driver/Linux_BT_USB_v3.1_20150526_8723BU_BTCOEX_20150119-5844_Edimax/bluetooth_usb_driver/rtk_coex.c	2016-03-03 02:01:38.000000000 +0100
++++ b/EW-7611ULB_Bluetooth_driver/Linux_BT_USB_v3.1_20150526_8723BU_BTCOEX_20150119-5844_Edimax/bluetooth_usb_driver/rtk_coex.c	2017-07-31 20:45:00.000000000 +0200
+@@ -33,7 +33,7 @@
+ 
+ #define RTK_VERSION "1.2"
+ 
+-#define RTKBT_DBG(fmt, arg...) printk(KERN_INFO "rtk_btcoex: " fmt "\n" , ## arg)
++#define RTKBT_DBG(fmt, arg...) printk(KERN_DEBUG "rtk_btcoex: " fmt "\n" , ## arg)
+ #define RTKBT_INFO(fmt, arg...) printk(KERN_INFO "rtk_btcoex: " fmt "\n" , ## arg)
+ #define RTKBT_WARN(fmt, arg...) printk(KERN_WARNING "rtk_btcoex: " fmt "\n", ## arg)
+ #define RTKBT_ERR(fmt, arg...) printk(KERN_WARNING "rtk_btcoex: " fmt "\n", ## arg)
+@@ -448,6 +448,8 @@
+ #if HCI_VERSION_CODE >= KERNEL_VERSION(3, 10, 0)
+ #if HCI_VERSION_CODE < KERNEL_VERSION(4, 4, 0)
+ 	bt_cb(skb)->req.start = true;
++#elif HCI_VERSION_CODE >= KERNEL_VERSION(4,5,0)
++	bt_cb(skb)->hci.req_flags |= HCI_REQ_START;
+ #else
+ 	bt_cb(skb)->hci.req_start = true;
+ #endif
