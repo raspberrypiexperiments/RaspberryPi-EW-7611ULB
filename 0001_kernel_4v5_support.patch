@@ -30,7 +30,7 @@
  	bt_cb(skb)->hci.req_start = true;
  #endif
 --- a/EW-7611ULB_Bluetooth_driver/Linux_BT_USB_v3.1_20150526_8723BU_BTCOEX_20150119-5844_Edimax/Makefile	2016-04-27 00:39:08.000000000 +0000
-+++ b/EW-7611ULB_Bluetooth_driver/Linux_BT_USB_v3.1_20150526_8723BU_BTCOEX_20150119-5844_Edimax/Makefile	2017-11-28 21:09:06.403208110 +0000
++++ b/EW-7611ULB_Bluetooth_driver/Linux_BT_USB_v3.1_20150526_8723BU_BTCOEX_20150119-5844_Edimax/Makefile	2017-11-29 18:52:54.014757699 +0000
 @@ -12,7 +12,7 @@
  	- rmmod rtk_btusb
  	make -C $(SRC_DIR) -s
@@ -39,4 +39,13 @@
 +	depmod -a
  	make -C $(SRC_DIR) clean -s
  	echo "install rtk_btusb success!"
+ 
+@@ -24,7 +24,7 @@
+ 	- mv -n $(DRV_DIR)/btusb_bak $(DRV_DIR)/btusb.ko
+ 	- rmmod rtk_btusb
+ 	rm -f $(DRV_DIR)/rtk_btusb.ko
+-	depmod -a $(MDL_DIR)
++	depmod -a
+ 	echo "uninstall rtk_btusb success!"
+ ##########################################
  

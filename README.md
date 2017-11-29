@@ -6,8 +6,16 @@ This repository enables to build Edimax EW-7611ULB Bluetooth driver for kernel >
 
 ## Installation
 
-Execute:
+To install the Edimax EW-7611UBL Bluetooth driver execute:
 
 ```
 sudo make install
+```
+
+## Uninstallation
+
+To uninstall the Edimax EW-7611UBL Bluetooth driver execute:
+
+```
+sudo make uninstall
 ```
