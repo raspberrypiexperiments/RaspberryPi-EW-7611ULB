@@ -1,0 +1,363 @@
+--- a/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/Makefile	2019-05-16 19:35:20.000000000 +0200
++++ b/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/Makefile	2020-11-14 00:04:23.428456140 +0100
+@@ -15,6 +15,8 @@
+ #EXTRA_CFLAGS += -Wno-unused
+ #EXTRA_CFLAGS += -Wno-uninitialized
+ 
++EXTRA_CFLAGS += -Wno-error=incompatible-pointer-types
++
+ GCC_VER_49 := $(shell echo `$(CC) -dumpversion | cut -f1-2 -d.` \>= 4.9 | bc )
+ ifeq ($(GCC_VER_49),1)
+ EXTRA_CFLAGS += -Wno-date-time	# Fix compile error && warning on gcc 4.9 and later
+--- a/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/os_dep/linux/ioctl_cfg80211.c	2019-05-16 19:35:20.000000000 +0200
++++ b/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/os_dep/linux/ioctl_cfg80211.c	2020-11-13 21:51:12.319298158 +0100
+@@ -413,7 +413,7 @@
+ 	u8 ret = _SUCCESS;
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
+-	struct cfg80211_chan_def chdef;
++	struct cfg80211_chan_def chdef = {};
+ 
+ 	ret = rtw_chbw_to_cfg80211_chan_def(wiphy, &chdef, ch, bw, offset, ht);
+ 	if (ret != _SUCCESS)
+--- a/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/os_dep/linux/rtw_cfgvendor.c	2019-05-16 19:35:20.000000000 +0200
++++ b/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/os_dep/linux/rtw_cfgvendor.c	2020-11-12 20:03:42.968687346 +0100
+@@ -1746,6 +1746,9 @@
+ 			.subcmd = GSCAN_SUBCMD_GET_CAPABILITIES
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_gscan_get_capabilities
+ 	},
+ 	{
+@@ -1754,6 +1757,9 @@
+ 			.subcmd = GSCAN_SUBCMD_SET_CONFIG
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_set_scan_cfg
+ 	},
+ 	{
+@@ -1762,6 +1768,9 @@
+ 			.subcmd = GSCAN_SUBCMD_SET_SCAN_CONFIG
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_set_batch_scan_cfg
+ 	},
+ 	{
+@@ -1770,6 +1779,9 @@
+ 			.subcmd = GSCAN_SUBCMD_ENABLE_GSCAN
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_initiate_gscan
+ 	},
+ 	{
+@@ -1778,6 +1790,9 @@
+ 			.subcmd = GSCAN_SUBCMD_ENABLE_FULL_SCAN_RESULTS
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_enable_full_scan_result
+ 	},
+ 	{
+@@ -1786,6 +1801,9 @@
+ 			.subcmd = GSCAN_SUBCMD_SET_HOTLIST
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_hotlist_cfg
+ 	},
+ 	{
+@@ -1794,6 +1812,9 @@
+ 			.subcmd = GSCAN_SUBCMD_SET_SIGNIFICANT_CHANGE_CONFIG
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_significant_change_cfg
+ 	},
+ 	{
+@@ -1802,6 +1823,9 @@
+ 			.subcmd = GSCAN_SUBCMD_GET_SCAN_RESULTS
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_gscan_get_batch_results
+ 	},
+ 	{
+@@ -1810,6 +1834,9 @@
+ 			.subcmd = GSCAN_SUBCMD_GET_CHANNEL_LIST
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_gscan_get_channel_list
+ 	},
+ #endif /* GSCAN_SUPPORT */
+@@ -1820,6 +1847,9 @@
+ 			.subcmd = RTT_SUBCMD_SET_CONFIG
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_rtt_set_config
+ 	},
+ 	{
+@@ -1828,6 +1858,9 @@
+ 			.subcmd = RTT_SUBCMD_CANCEL_CONFIG
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_rtt_cancel_config
+ 	},
+ 	{
+@@ -1836,6 +1869,9 @@
+ 			.subcmd = RTT_SUBCMD_GETCAPABILITY
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_rtt_get_capability
+ 	},
+ #endif /* RTT_SUPPORT */
+@@ -1846,6 +1882,9 @@
+ 			.subcmd = LSTATS_SUBCMD_GET_INFO
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_lstats_get_info
+ 	},
+ 	{
+@@ -1854,6 +1893,9 @@
+ 			.subcmd = LSTATS_SUBCMD_SET_INFO
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_lstats_set_info
+ 	},
+ 	{
+@@ -1862,6 +1904,9 @@
+ 			.subcmd = LSTATS_SUBCMD_CLEAR_INFO
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_lstats_clear_info
+ 	},
+ #endif /* CONFIG_RTW_CFGVEDNOR_LLSTATS */
+@@ -1872,6 +1917,9 @@
+                         .subcmd = WIFI_SUBCMD_SET_RSSI_MONITOR
+                 },
+                 .flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+                 .doit = rtw_cfgvendor_set_rssi_monitor
+         },
+ #endif /* CONFIG_RTW_CFGVEDNOR_RSSIMONITOR */
+@@ -1882,6 +1930,9 @@
+ 			.subcmd = LOGGER_START_LOGGING
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_logger_start_logging
+ 	},
+ 	{
+@@ -1890,6 +1941,9 @@
+ 			.subcmd = LOGGER_GET_FEATURE
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_logger_get_feature
+ 	},
+ 	{
+@@ -1898,6 +1952,9 @@
+ 			.subcmd = LOGGER_GET_VER
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_logger_get_version
+ 	},
+ 	{
+@@ -1906,6 +1963,9 @@
+ 			.subcmd = LOGGER_GET_RING_STATUS
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_logger_get_ring_status
+ 	},
+ 	{
+@@ -1914,6 +1974,9 @@
+ 			.subcmd = LOGGER_GET_RING_DATA
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_logger_get_ring_data
+ 	},
+ 	{
+@@ -1922,6 +1985,9 @@
+ 			.subcmd = LOGGER_TRIGGER_MEM_DUMP
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_logger_get_firmware_memory_dump
+ 	},
+ 	{
+@@ -1930,6 +1996,9 @@
+ 			.subcmd = LOGGER_START_PKT_FATE_MONITORING
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_logger_start_pkt_fate_monitoring
+ 	},
+ 	{
+@@ -1938,6 +2007,9 @@
+ 			.subcmd = LOGGER_GET_TX_PKT_FATES
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_logger_get_tx_pkt_fates
+ 	},
+ 	{
+@@ -1946,6 +2018,9 @@
+ 			.subcmd = LOGGER_GET_RX_PKT_FATES
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_logger_get_rx_pkt_fates
+ 	},	
+ #endif /* CONFIG_RTW_CFGVENDOR_WIFI_LOGGER */
+@@ -1957,6 +2032,9 @@
+ 			.subcmd = WIFI_SUBCMD_SET_PNO_RANDOM_MAC_OUI
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_set_rand_mac_oui
+ 	},
+ #endif
+@@ -1966,6 +2044,9 @@
+ 			.subcmd = WIFI_SUBCMD_NODFS_SET
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_set_nodfs_flag
+ 
+ 	},
+@@ -1975,6 +2056,9 @@
+ 			.subcmd = WIFI_SUBCMD_SET_COUNTRY_CODE
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_set_country
+ 	},
+ 	{
+@@ -1983,6 +2067,9 @@
+ 			.subcmd = WIFI_SUBCMD_CONFIG_ND_OFFLOAD
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_set_nd_offload
+ 	},
+ #endif /* CONFIG_RTW_WIFI_HAL */
+@@ -1992,6 +2079,9 @@
+ 			.subcmd = WIFI_SUBCMD_GET_FEATURE_SET
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_get_feature_set
+ 	},
+ 	{
+@@ -2000,6 +2090,9 @@
+ 			.subcmd = WIFI_SUBCMD_GET_FEATURE_SET_MATRIX
+ 		},
+ 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,3,0)
++		.policy = VENDOR_CMD_RAW_DATA,
++#endif
+ 		.doit = rtw_cfgvendor_get_feature_set_matrix
+ 	}
+ };
+--- a/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/os_dep/osdep_service.c	2019-05-16 19:35:20.000000000 +0200
++++ b/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/os_dep/osdep_service.c	2020-11-12 19:16:29.055748460 +0100
+@@ -2221,7 +2221,7 @@
+ 		ret = PTR_ERR(fp);
+ 	else {
+ 		oldfs = get_fs();
+-		set_fs(get_ds());
++		set_fs(KERNEL_DS);
+ 
+ 		if (1 != readFile(fp, &buf, 1))
+ 			ret = PTR_ERR(fp);
+@@ -2259,7 +2259,7 @@
+ 			RTW_INFO("%s openFile path:%s fp=%p\n", __FUNCTION__, path , fp);
+ 
+ 			oldfs = get_fs();
+-			set_fs(get_ds());
++			set_fs(KERNEL_DS);
+ 			ret = readFile(fp, buf, sz);
+ 			set_fs(oldfs);
+ 			closeFile(fp);
+@@ -2294,7 +2294,7 @@
+ 			RTW_INFO("%s openFile path:%s fp=%p\n", __FUNCTION__, path , fp);
+ 
+ 			oldfs = get_fs();
+-			set_fs(get_ds());
++			set_fs(KERNEL_DS);
+ 			ret = writeFile(fp, buf, sz);
+ 			set_fs(oldfs);
+ 			closeFile(fp);
