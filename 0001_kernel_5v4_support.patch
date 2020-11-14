@@ -9,17 +9,6 @@
  GCC_VER_49 := $(shell echo `$(CC) -dumpversion | cut -f1-2 -d.` \>= 4.9 | bc )
  ifeq ($(GCC_VER_49),1)
  EXTRA_CFLAGS += -Wno-date-time	# Fix compile error && warning on gcc 4.9 and later
---- a/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/os_dep/linux/ioctl_cfg80211.c	2019-05-16 19:35:20.000000000 +0200
-+++ b/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/os_dep/linux/ioctl_cfg80211.c	2020-11-13 21:51:12.319298158 +0100
-@@ -413,7 +413,7 @@
- 	u8 ret = _SUCCESS;
- 
- #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
--	struct cfg80211_chan_def chdef;
-+	struct cfg80211_chan_def chdef = {};
- 
- 	ret = rtw_chbw_to_cfg80211_chan_def(wiphy, &chdef, ch, bw, offset, ht);
- 	if (ret != _SUCCESS)
 --- a/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/os_dep/linux/rtw_cfgvendor.c	2019-05-16 19:35:20.000000000 +0200
 +++ b/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/os_dep/linux/rtw_cfgvendor.c	2020-11-12 20:03:42.968687346 +0100
 @@ -1746,6 +1746,9 @@
@@ -361,3 +350,76 @@
  			ret = writeFile(fp, buf, sz);
  			set_fs(oldfs);
  			closeFile(fp);
+--- a/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/core/rtw_ap.c	2019-05-16 19:35:20.000000000 +0200
++++ b/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/core/rtw_ap.c	2020-11-14 07:49:32.663117531 +0100
+@@ -1800,7 +1800,8 @@
+ 				, pdvobj->padapters[i]->mlmeextpriv.cur_channel
+ 				, pdvobj->padapters[i]->mlmeextpriv.cur_bwmode
+ 				, pdvobj->padapters[i]->mlmeextpriv.cur_ch_offset
+-				, ht_option);
++				, ht_option,
++				0);
+ 		}
+ 	}
+ #endif /* defined(CONFIG_IOCTL_CFG80211) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 5, 0)) */
+--- a/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/core/rtw_mlme_ext.c	2019-05-16 19:35:20.000000000 +0200
++++ b/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/core/rtw_mlme_ext.c	2020-11-14 07:57:33.933863804 +0100
+@@ -16061,7 +16061,7 @@
+ 
+ 						rtw_cfg80211_ch_switch_notify(iface
+ 							, mlmeext->cur_channel, mlmeext->cur_bwmode, mlmeext->cur_ch_offset
+-							, ht_option);
++							, ht_option, 0);
+ 						#endif
+ 					}
+ 				}
+@@ -16279,7 +16279,7 @@
+ 				the bss freq is updated by channel switch event.
+ 			*/
+ 			rtw_cfg80211_ch_switch_notify(adapter,
+-				cur_ch, cur_bw, cur_ch_offset, ht_option);
++				cur_ch, cur_bw, cur_ch_offset, ht_option, 1);
+ 		}
+ #endif
+ 	}
+--- a/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/os_dep/linux/ioctl_cfg80211.c	2019-05-16 19:35:20.000000000 +0200
++++ b/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/os_dep/linux/ioctl_cfg80211.c	2020-11-14 07:54:46.193628405 +0100
+@@ -407,18 +407,25 @@
+ #endif /* (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 29)) */
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 5, 0))
+-u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset, u8 ht)
++u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset, u8 ht, bool started)
+ {
+ 	struct wiphy *wiphy = adapter_to_wiphy(adapter);
+ 	u8 ret = _SUCCESS;
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0))
+-	struct cfg80211_chan_def chdef;
++	struct cfg80211_chan_def chdef = {};
+ 
+ 	ret = rtw_chbw_to_cfg80211_chan_def(wiphy, &chdef, ch, bw, offset, ht);
+ 	if (ret != _SUCCESS)
+ 		goto exit;
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0))
++	if (started) {
++		cfg80211_ch_switch_started_notify(adapter->pnetdev, &chdef, 0);
++		goto exit;
++	}
++#endif
++
+ 	cfg80211_ch_switch_notify(adapter->pnetdev, &chdef);
+ 
+ #else
+--- a/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/os_dep/linux/ioctl_cfg80211.h	2019-05-16 19:35:20.000000000 +0200
++++ b/Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272/os_dep/linux/ioctl_cfg80211.h	2020-11-14 07:55:28.143689209 +0100
+@@ -407,7 +407,7 @@
+ #endif
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 5, 0))
+-u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset, u8 ht);
++u8 rtw_cfg80211_ch_switch_notify(_adapter *adapter, u8 ch, u8 bw, u8 offset, u8 ht, bool started);
+ #endif
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 26)) && (LINUX_VERSION_CODE < KERNEL_VERSION(4, 7, 0))
