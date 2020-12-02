@@ -3,7 +3,7 @@ NUM_PROCESSORS = `grep -c ^processor /proc/cpuinfo`
 dependencies:
 	sudo apt update
 	sudo apt upgrade -y
-	sudo apt install raspberrypi-kernel-headers -y
+	sudo apt install raspberrypi-kernel-headers bc -y
 
 install_wifi: dependencies
 	MODEL=EW-7611ULB && SRC_NAME=Linux_Driver && SRC_VER=1.0.1.1 && SRC_EXT=zip && \
