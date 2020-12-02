@@ -11,7 +11,7 @@ rm -rf $${MODEL}_$${SRC_NAME}_$${SRC_VER}.$${SRC_EXT} && \
 wget https://www.edimax.com/edimax/mw/cufiles/files/download/Driver_Utility/$${MODEL}/$${MODEL}_$${SRC_NAME}_$${SRC_VER}.$${SRC_EXT} && \
 rm -rf Bluetooth && rm -rf Wi-FI && unzip $${MODEL}_$${SRC_NAME}_$${SRC_VER}.$${SRC_EXT} && \
 rm -rf Bluetooth && rm -rf $${MODEL}_$${SRC_NAME}_$${SRC_VER}.$${SRC_EXT} && patch -p1 < 0001_kernel_5v4_support.patch && \
-cd Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272 && ARCH=arm make -j$(NUM_PROCESSORS) && sido make install && \
+cd Wi-FI/rtl8723BU_WiFi_linux_v5.8.4_33660.20190516_COEX20181129-7272 && ARCH=arm make -j$(NUM_PROCESSORS) && sudo make install && \
 cd ../.. && rm -rf Wi-FI	
 
 uninstall_wifi: dependencies
