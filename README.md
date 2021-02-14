@@ -2,7 +2,8 @@
 
 ## Overview
 
-This repository enables to build Edimax EW-7611ULB Wi-Fi driver (for kernel >= 5.4) and Bluetooth driver (for kernel >= v4.5) on Raspberry Pi.
+This repository enables to build Edimax EW-7611ULB Wi-Fi driver (for 
+kernel >= 5.10) and Bluetooth driver (for kernel >= v4.5) on Raspberry Pi.
 
 ## Installation
 
